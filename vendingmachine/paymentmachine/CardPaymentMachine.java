@@ -1,7 +1,6 @@
 package vendingmachine.paymentmachine;
 
-import vendingmachine.currency.Currency;
-import vendingmachine.currency.NotSameCurrencyKindException;
+import vendingmachine.Currency;
 import vendingmachine.moneysource.card.Card;
 
 public class CardPaymentMachine implements PaymentMachine<Card> {
@@ -14,16 +13,12 @@ public class CardPaymentMachine implements PaymentMachine<Card> {
     }
 
     @Override
-    public boolean pay(Currency currency) {
+    public boolean pay(Currency currency, int paidValue) {
         if (source == null) {
             return false;
         }
-        try {
-            source.pay(currency);
-            return true;
-        } catch (NotSameCurrencyKindException e) {
-            return false;
-        }
+        source.pay(currency, paidValue);
+        return true;
     }
 
     @Override

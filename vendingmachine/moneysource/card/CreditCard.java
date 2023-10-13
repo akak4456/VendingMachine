@@ -1,24 +1,31 @@
 package vendingmachine.moneysource.card;
 
-import vendingmachine.currency.Currency;
-import vendingmachine.currency.KoreaWon;
-import vendingmachine.currency.NotSameCurrencyKindException;
+import vendingmachine.Currency;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class CreditCard extends Card {
-    KoreaWon maxAmount;
-    List<KoreaWon> usedList;
+
+    private int maxAmount;
+    List<Integer> usedList;
+
+    public CreditCard(Currency currency, int maxAmount) {
+        super(currency);
+        this.maxAmount = maxAmount;
+    }
 
     @Override
-    public boolean pay(Currency currency) throws NotSameCurrencyKindException {
-        KoreaWon totalUsed = new KoreaWon(0);
-        for (KoreaWon used : usedList) {
-            totalUsed.addCurrency(used);
+    public boolean pay(Currency currency, int value) {
+        if (this.currency != currency) {
+            return false;
         }
-        totalUsed.addCurrency(currency);
-        if (maxAmount.isGreaterThanOrEqualsTo(totalUsed)) {
-            usedList.add((KoreaWon) currency);
+        int totalUsed = 0;
+        for (int used : usedList) {
+            totalUsed += used;
+        }
+        if (this.maxAmount >= totalUsed) {
+            usedList.add(value);
             return true;
         }
         return false;

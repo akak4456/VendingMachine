@@ -1,22 +1,24 @@
 package vendingmachine.moneysource.card;
 
-import vendingmachine.currency.Currency;
-import vendingmachine.currency.KoreaWon;
-import vendingmachine.currency.NotSameCurrencyKindException;
+import vendingmachine.Currency;
 
 public class CheckCard extends Card {
-    private KoreaWon amount;
 
-    public CheckCard(KoreaWon amount) {
-        this.amount = amount;
+    private int remainAmount;
+
+    public CheckCard(Currency currency, int remainAmount) {
+        super(currency);
+        this.remainAmount = remainAmount;
     }
 
     @Override
-    public boolean pay(Currency currency) throws NotSameCurrencyKindException {
-        if (amount.isGreaterThanOrEqualsTo(currency)) {
-            amount.subtractCurrency(currency);
-            return true;
+    public boolean pay(Currency currency, int paidValue) {
+        if(this.currency != currency) {
+            return false;
         }
-        return false;
+        if(this.remainAmount >= paidValue) {
+            this.remainAmount -= paidValue;
+        }
+        return true;
     }
 }

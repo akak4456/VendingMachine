@@ -1,9 +1,10 @@
 package vendingmachine.moneysource.cash;
 
-import vendingmachine.currency.KoreaWon;
+import vendingmachine.Currency;
 
-public class WonCash extends Cash{
-    public WonCash(int won) {
-        currency = new KoreaWon(won);
+public class WonCash extends Cash {
+
+    public WonCash(int expressionValue) {
+        super(Currency.KRW, expressionValue);
     }
 }

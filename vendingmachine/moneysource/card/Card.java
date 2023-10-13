@@ -1,9 +1,12 @@
 package vendingmachine.moneysource.card;
 
-import vendingmachine.currency.Currency;
-import vendingmachine.currency.NotSameCurrencyKindException;
+import vendingmachine.Currency;
 import vendingmachine.moneysource.MoneySource;
 
 public abstract class Card extends MoneySource {
-    public abstract boolean pay(Currency currency) throws NotSameCurrencyKindException;
+    public Card(Currency currency) {
+        super(currency);
+    }
+
+    public abstract boolean pay(Currency currency, int paidValue);
 }

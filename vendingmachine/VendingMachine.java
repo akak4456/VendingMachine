@@ -1,29 +1,26 @@
 package vendingmachine;
 
-import vendingmachine.currency.Currency;
-import vendingmachine.currency.NotSameCurrencyKindException;
 import vendingmachine.moneysource.card.Card;
 import vendingmachine.moneysource.cash.Cash;
 import vendingmachine.paymentmachine.CardPaymentMachine;
 import vendingmachine.paymentmachine.CashPaymentMachine;
-import vendingmachine.paymentmachine.PaymentMachine;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class VendingMachine<C extends Currency> {
+public class VendingMachine {
 
     private CashPaymentMachine cashPaymentMachine;
     private CardPaymentMachine cardPaymentMachine;
 
-    private List<List<Item<C>>> vendingMachineItems;
+    private List<List<Item>> vendingMachineItems;
 
-    private List<Item<C>> vendingMachineOutletItems;
+    private List<Item> vendingMachineOutletItems;
 
     public VendingMachine(
             CashPaymentMachine cashPaymentMachine,
             CardPaymentMachine cardPaymentMachine,
-            List<List<Item<C>>> vendingMachineItems
+            List<List<Item>> vendingMachineItems
     ) {
         this.cashPaymentMachine = cashPaymentMachine;
         this.cardPaymentMachine = cardPaymentMachine;
@@ -33,8 +30,8 @@ public class VendingMachine<C extends Currency> {
 
     public void printDisplayItems() {
         System.out.println("-----------------------------------------------------------------------");
-        for (List<Item<C>> items : vendingMachineItems) {
-            for (Item<C> item : items) {
+        for (List<Item> items : vendingMachineItems) {
+            for (Item item : items) {
                 System.out.print(item + " ");
             }
             System.out.println();
@@ -43,32 +40,28 @@ public class VendingMachine<C extends Currency> {
     }
 
     public void pushCash(Cash cash) {
-        try {
-            if (cashPaymentMachine.receive(cash)) {
-                System.out.println("자판기에 돈을 넣었습니다. (현재 잔액:" + cashPaymentMachine.getTotalCurrency() + ")");
-                for (List<Item<C>> items : vendingMachineItems) {
-                    for (Item<C> item : items) {
-                        item.isButtonLightOn = cashPaymentMachine.getTotalCurrency().isGreaterThanOrEqualsTo(item.productPrice);
-                    }
+        if (cashPaymentMachine.receive(cash)) {
+            System.out.println("자판기에 돈을 넣었습니다. (현재 잔액:" + cashPaymentMachine.getTotalMoney() + ")");
+            for (List<Item> items : vendingMachineItems) {
+                for (Item item : items) {
+                    item.isButtonLightOn = cash.isGreaterThanOrEqualsTo(item.productCurrency, item.productPrice);
                 }
-            } else {
-                System.out.println("자판기에 지원하지 않는 돈을 넣으셨습니다.");
             }
-        } catch (NotSameCurrencyKindException e) {
+        } else {
             System.out.println("자판기에 지원하지 않는 돈을 넣으셨습니다.");
         }
     }
 
     public void selectItem(int row, int col) {
         if (0 <= row && row < vendingMachineItems.size() && 0 <= col && col < vendingMachineItems.get(row).size()) {
-            Item<C> selectedItem = vendingMachineItems.get(row).get(col);
+            Item selectedItem = vendingMachineItems.get(row).get(col);
             if (selectedItem.isButtonLightOn) {
-                if (cashPaymentMachine.pay(selectedItem.productPrice)) {
+                if (cashPaymentMachine.pay(selectedItem.productCurrency, selectedItem.productPrice)) {
                     // 우선 현금부터 먼저 결제한다.
-                    System.out.println("현금 결제 하였습니다. (현재 잔액:" + cashPaymentMachine.getTotalCurrency() + ")");
+                    System.out.println("현금 결제 하였습니다. (현재 잔액:" + cashPaymentMachine.getTotalMoney() + ")");
                     allButtonOff();
                     vendingMachineOutletItems.add(selectedItem);
-                } else if (cardPaymentMachine.pay(selectedItem.productPrice)) {
+                } else if (cardPaymentMachine.pay(selectedItem.productCurrency, selectedItem.productPrice)) {
                     // 그 다음 카드 결제를 시도한다.
                     System.out.println("카드 결제 하였습니다.");
                     allButtonOff();
@@ -87,8 +80,8 @@ public class VendingMachine<C extends Currency> {
     public void pushCard(Card card) {
         if (cardPaymentMachine.receive(card)) {
             System.out.println("카드를 정상적으로 넣었습니다.");
-            for (List<Item<C>> items : vendingMachineItems) {
-                for (Item<C> item : items) {
+            for (List<Item> items : vendingMachineItems) {
+                for (Item item : items) {
                     item.isButtonLightOn = true;
                 }
             }
@@ -99,34 +92,36 @@ public class VendingMachine<C extends Currency> {
 
     public void printOutletItems() {
         System.out.print("배출구에 있는 아이템들: ");
-        for (Item<C> item : vendingMachineOutletItems) {
+        for (Item item : vendingMachineOutletItems) {
             System.out.print(item + " ");
         }
         System.out.println();
     }
 
     private void allButtonOff() {
-        for (List<Item<C>> items : vendingMachineItems) {
-            for (Item<C> item : items) {
+        for (List<Item> items : vendingMachineItems) {
+            for (Item item : items) {
                 item.isButtonLightOn = false;
             }
         }
     }
 
-    public static class Item<C extends Currency> {
+    public static class Item {
         private String productName;
-        private C productPrice;
+        private Currency productCurrency;
+        private int productPrice;
         private boolean isButtonLightOn;
 
-        public Item(String productName, C productPrice) {
+        public Item(String productName, Currency productCurrency, int productPrice) {
             this.productName = productName;
+            this.productCurrency = productCurrency;
             this.productPrice = productPrice;
             isButtonLightOn = false;
         }
 
         @Override
         public String toString() {
-            return productName + " (" + productPrice + ", " + (isButtonLightOn ? "on" : "off") + ")";
+            return productName + " (" + productPrice + productCurrency.unit + ", " + (isButtonLightOn ? "on" : "off") + ")";
         }
     }
 }
