@@ -13,3 +13,22 @@
 - 돈은 원화, 달러 등을 고려해야 하기에 독립된 하나의 객체로 만드는 것이 좋을 것 같다.
 - 결제기는 돈 받기, 거스름돈 정산 같은 역할을 하는 것이 좋을 것 같다.
 - 상품을 보여주는 것, 배출구도 객체로 만드는 것이 좋을 것 같다.
+
+실제로 구현한 설계
+- VendingMachineClient: 자판기를 사용하는 사용자
+- VendingMachine: 자판기. 현재 자판기의 종류에는 상품 명등을 콘솔에서 보여주는 VendingMacineConsole 이 존재함
+- Currency: 통화. 현재는 KRW(원화), USD(달러) 가 있음
+- VendingMachineItem: 자판기 안에 들어가는 상품. Console 출력용 아이템인 VendingMachineConsoleItem 이 존재함
+- MoneySource: 돈의 원천. MoneySource 끼리는 서로 더하거나 뺄 수 있고 비교할 수도 있음. Cash 와 Card 로 나뉘는데 원론상으로 이 두종류끼리 더하거나 빼기, 비교하기 연산이 가능하나 권장하는 것은 아님. Card 에는 CheckCard(체크카드), CreditCard(신용카드) 가 있어서 카드 종류에 따라 한도가 달라짐. Cash 는 원화, 달러를 나타내는 것이 있으며 자판기에는 담을 수 없는 형태의 지폐도 존재함
+- PaymentMachine: 결제기. 카드를 받는 CardPaymentMachine 과 현금을 받는 CashPaymentMachine 이 존재함
+
+이렇게 설계함으로써 얻을 수 있는 이점
+- 나중에 유로화, 위안화 등 여러 통화에 대해서도 대응할 수 있다.
+- 다른 출력 형태에 대해서 VendingMachine 을 상속함으로써 구현할 수 있다.
+- 여러 종류의 현금, Card 에 대해서 추가가 가능하다.
+
+헤멨던 부분
+- 원래 Currency 를 abstract class 로 구현하고 이를 상속하는 KoreaWon(원화), USDDollar(달러) 를 구현하고자 하니, 더하거나 빼기 등을 할 때 불필요한 예외가 발생하고, 객체를 생성하는데 다소 어려움이 발생하였다. 따라서 Currency 는 enum 으로 설계하였다.
+
+잠재된 문제점
+- 현재 MoneySource 같은 경우 Currency 만 동일하다면 모든 연산이 가능하다. Cash 와 Card 사이에도 이러한 연산을 시키는 것이 맞을까?
