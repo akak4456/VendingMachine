@@ -4,31 +4,32 @@ import vendingmachine.Currency;
 import vendingmachine.moneysource.cash.Cash;
 
 public class CashPaymentMachine implements PaymentMachine<Cash> {
-    Cash source = null;
+    private Cash source = null;
 
-    Class<? extends Cash> availableClass;
+    private final Class<? extends Cash> availableClass;
 
     public CashPaymentMachine(Class<? extends Cash> availableClass) {
         this.availableClass = availableClass;
     }
 
-    public int getTotalMoney() {
-        if (source == null) {
-            return 0;
-        }
-        return source.getExpressionValue();
+    public String getCurrentCashString() {
+        return source.toString();
+    }
+
+    public boolean isSourceGreaterThanOrEqualsTo(Currency currency, int paidValue) {
+        return source.isGreaterThanOrEqualsTo(currency, paidValue);
     }
 
     @Override
     public boolean receive(Cash source) {
-        if(this.source == null) {
-            this.source = source;
-            return true;
-        }
         if (availableClass != source.getClass()) {
             return false;
         }
-        return this.source.addCash(source);
+        if (this.source == null) {
+            this.source = source;
+            return true;
+        }
+        return this.source.addExpressionValue(source);
     }
 
     @Override
@@ -36,15 +37,13 @@ public class CashPaymentMachine implements PaymentMachine<Cash> {
         if (source == null) {
             return false;
         }
-        if (this.source.isGreaterThanOrEqualsTo(source)) {
-            this.source.subtractCash(source);
-            return true;
-        }
-        return false;
+        return this.source.subtractExpressionValueIfPossible(currency, paidValue, 0);
     }
 
     @Override
     public Cash change() {
-        return source;
+        Cash returnSource = source;
+        source = null;
+        return returnSource;
     }
 }

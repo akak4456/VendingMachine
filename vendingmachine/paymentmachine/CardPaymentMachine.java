@@ -4,10 +4,19 @@ import vendingmachine.Currency;
 import vendingmachine.moneysource.card.Card;
 
 public class CardPaymentMachine implements PaymentMachine<Card> {
-    Card source = null;
+    private Card source = null;
+
+    private Currency availableCurrency;
+
+    public CardPaymentMachine(Currency availableCurrency) {
+        this.availableCurrency = availableCurrency;
+    }
 
     @Override
     public boolean receive(Card source) {
+        if(availableCurrency != source.getCurrency()) {
+            return false;
+        }
         this.source = source;
         return true;
     }
@@ -17,12 +26,13 @@ public class CardPaymentMachine implements PaymentMachine<Card> {
         if (source == null) {
             return false;
         }
-        source.pay(currency, paidValue);
-        return true;
+        return source.subtractExpressionValueIfPossible(currency, paidValue, source.getUnderBound());
     }
 
     @Override
     public Card change() {
-        return null;
+        Card returnSource = source;
+        source = null;
+        return returnSource;
     }
 }
