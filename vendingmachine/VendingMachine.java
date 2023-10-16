@@ -1,92 +1,69 @@
 package vendingmachine;
 
-import vendingmachine.item.VendingMachineItem;
-import vendingmachine.moneysource.card.Card;
-import vendingmachine.moneysource.cash.Cash;
-import vendingmachine.paymentmachine.CardPaymentMachine;
+import vendingmachine.itemselector.ItemSelector;
+import vendingmachine.itemselector.SelectorDTO;
+import vendingmachine.material.Metal;
+import vendingmachine.material.Paper;
 import vendingmachine.paymentmachine.CashPaymentMachine;
+import vendingmachine.people.NormalPeople;
 
-import java.util.ArrayList;
-import java.util.List;
+public abstract class VendingMachine<S extends SelectorDTO> {
+    protected CashPaymentMachine cashPaymentMachine;
 
-public abstract class VendingMachine<I extends VendingMachineItem> {
-
-    protected final CashPaymentMachine cashPaymentMachine;
-    protected final CardPaymentMachine cardPaymentMachine;
-    protected final List<List<I>> vendingMachineItems;
-    protected final List<I> vendingMachineOutletItems;
+    protected ItemSelector<S> itemSelector;
 
     public VendingMachine(
             CashPaymentMachine cashPaymentMachine,
-            CardPaymentMachine cardPaymentMachine,
-            List<List<I>> vendingMachineItems
+            ItemSelector<S> itemSelector
     ) {
         this.cashPaymentMachine = cashPaymentMachine;
-        this.cardPaymentMachine = cardPaymentMachine;
-        this.vendingMachineItems = vendingMachineItems;
-        this.vendingMachineOutletItems = new ArrayList<>();
+        this.itemSelector = itemSelector;
     }
 
-    public abstract void printDisplayItems();
+    protected abstract void printWhenPushPaperSuccess();
 
-    public abstract void printOutletItems();
+    protected abstract void printWhenPushPaperFail();
 
-    protected abstract void printWhenPushAvailableCash();
+    protected abstract void printWhenPushMetalSuccess();
 
-    protected abstract void printWhenPushNotAvailableCash();
+    protected abstract void printWhenPushMetalFail();
 
-    protected abstract void printWhenSelectItemCashSuccess();
+    protected abstract void printWhenIsAllChange();
 
-    protected abstract void printWhenSelectItemCardSuccess();
+    protected abstract void printWhenIsNotAllChange();
 
-    protected abstract void printWhenAllPaymentFail();
-
-    protected abstract void printWrongPositionItemSelected();
-
-    protected abstract void printWhenPushAvailableCard();
-
-    protected abstract void printWhenPushNotAvailableCard();
-
-    protected abstract void printWhenChange();
-
-    public void pushCash(Cash cash) {
-        if (cashPaymentMachine.receive(cash)) {
-            printWhenPushAvailableCash();
+    public void pushPaper(NormalPeople normalPeople, Paper paper) {
+        if (normalPeople.containsPaper(paper) && cashPaymentMachine.receivePaper(paper)) {
+            normalPeople.removePaper(paper);
+            printWhenPushPaperSuccess();
         } else {
-            printWhenPushNotAvailableCash();
+            printWhenPushPaperFail();
         }
+        itemSelector.showSelector(this);
     }
 
-    public void selectItem(int row, int col) {
-        if (0 <= row && row < vendingMachineItems.size() && 0 <= col && col < vendingMachineItems.get(row).size()) {
-            I selectedItem = vendingMachineItems.get(row).get(col);
-            if (cashPaymentMachine.pay(selectedItem.getProductCurrency(), selectedItem.getProductPrice())) {
-                // 우선 현금부터 먼저 결제한다.
-                vendingMachineOutletItems.add(selectedItem);
-                printWhenSelectItemCashSuccess();
-            } else if (cardPaymentMachine.pay(selectedItem.getProductCurrency(), selectedItem.getProductPrice())) {
-                // 그 다음 카드 결제를 시도한다.
-                vendingMachineOutletItems.add(selectedItem);
-                printWhenSelectItemCardSuccess();
-            } else {
-                printWhenAllPaymentFail();
-            }
+    public void pushMetal(NormalPeople normalPeople, Metal metal) {
+        if(normalPeople.containsMetal(metal) && cashPaymentMachine.receiveMetal(metal)) {
+            normalPeople.removeMetal(metal);
+            printWhenPushMetalSuccess();
         } else {
-            printWrongPositionItemSelected();
+            printWhenPushMetalFail();
         }
+        itemSelector.showSelector(this);
     }
 
-    public void pushCard(Card card) {
-        if (cardPaymentMachine.receive(card)) {
-            printWhenPushAvailableCard();
+    public void change(NormalPeople normalPeople) {
+        normalPeople.addAllPaper(cashPaymentMachine.changeByCash());
+        normalPeople.addAllMetal(cashPaymentMachine.changeByCoin());
+        if(cashPaymentMachine.isAllChange()) {
+            printWhenIsAllChange();
         } else {
-            printWhenPushNotAvailableCard();
+            printWhenIsNotAllChange();
         }
+        itemSelector.showSelector(this);
     }
 
-    public void change() {
-        cashPaymentMachine.change();
-        cardPaymentMachine.change();
-        printWhenChange();
+    public boolean isCashPaymentMachineVOGreaterThanOrEqualsTo(VendingMachineVO vo) {
+        return cashPaymentMachine.isUserVOGreaterThanOrEqualsTo(vo);
     }
 }

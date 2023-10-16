@@ -1,140 +1,93 @@
-import vendingmachine.Currency;
 import vendingmachine.VendingMachine;
 import vendingmachine.VendingMachineConsole;
-import vendingmachine.item.VendingMachineConsoleItem;
-import vendingmachine.moneysource.card.CheckCard;
-import vendingmachine.moneysource.card.CreditCard;
-import vendingmachine.moneysource.cash.BadDollarCash;
-import vendingmachine.moneysource.cash.BadWonCash;
-import vendingmachine.moneysource.cash.DollarCash;
-import vendingmachine.moneysource.cash.WonCash;
-import vendingmachine.paymentmachine.CardPaymentMachine;
+import vendingmachine.itemselector.ButtonItemSelector;
+import vendingmachine.itemselector.ButtonSelectorDTO;
+import vendingmachine.material.Metal;
+import vendingmachine.material.Paper;
 import vendingmachine.paymentmachine.CashPaymentMachine;
+import vendingmachine.people.NormalPeople;
+import vendingmachine.won.WonCash;
+import vendingmachine.won.WonCoin;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class VendingMachineClient {
     public static void main(String[] args) {
         VendingMachineClient client = new VendingMachineClient();
-        // client.storyKRW();
-        client.storyUSD();
+        client.story1();
     }
 
-    public void storyKRW() {
-        VendingMachine<VendingMachineConsoleItem> vendingMachine = new VendingMachineConsole(
-                new CashPaymentMachine(WonCash.class),
-                new CardPaymentMachine(Currency.KRW),
-                List.of(
-                        List.of(
-                                new VendingMachineConsoleItem("콜라", Currency.KRW, 2000),
-                                new VendingMachineConsoleItem("사이다", Currency.KRW, 2000),
-                                new VendingMachineConsoleItem("물", Currency.KRW, 1000),
-                                new VendingMachineConsoleItem("커피", Currency.KRW, 1000)
-                        ),
-                        List.of(
-                                new VendingMachineConsoleItem("껌", Currency.KRW, 1000),
-                                new VendingMachineConsoleItem("과자", Currency.KRW, 2000),
-                                new VendingMachineConsoleItem("아이스아메리카노", Currency.KRW, 1000),
-                                new VendingMachineConsoleItem("탄산음료", Currency.KRW, 2000)
-                        )
-                )
+    public void story1() {
+        NormalPeople normalPeople = generateNormalPeople1();
+        VendingMachine<ButtonSelectorDTO> vendingMachine = new VendingMachineConsole<>(
+                generateCashPaymentMachine(10, 10, 10, 10, 10, 10, 10, 10),
+                new ButtonItemSelector()
         );
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new WonCash(1000));
-        vendingMachine.pushCash(new BadWonCash(1000));
-        vendingMachine.pushCash(new DollarCash(1000));
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(0, 1);
-        vendingMachine.selectItem(0, 2);
-        vendingMachine.printOutletItems();
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new WonCash(2000));
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new WonCash(2000));
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new BadWonCash(2000));
-        vendingMachine.selectItem(0, 0);
-        vendingMachine.printOutletItems();
-        vendingMachine.selectItem(1, 1);
-        vendingMachine.printOutletItems();
-        vendingMachine.selectItem(0,0);
-        vendingMachine.pushCard(new CheckCard(Currency.KRW, 3000));
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(0,0);
-        vendingMachine.printOutletItems();
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(0,0);
-        vendingMachine.selectItem(0,2);
-        vendingMachine.pushCard(new CreditCard(Currency.KRW, 0,-5000));
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(1,0);
-        vendingMachine.selectItem(1,1);
-        vendingMachine.printOutletItems();
-        vendingMachine.selectItem(0,1);
-        vendingMachine.selectItem(0,1);
-        vendingMachine.pushCard(new CreditCard(Currency.USD, 0,-5000));
-        vendingMachine.printDisplayItems();
     }
 
-    public void storyUSD() {
-        VendingMachine<VendingMachineConsoleItem> vendingMachine = new VendingMachineConsole(
-                new CashPaymentMachine(DollarCash.class),
-                new CardPaymentMachine(Currency.USD),
-                List.of(
-                        List.of(
-                                new VendingMachineConsoleItem("콜라", Currency.USD, 2),
-                                new VendingMachineConsoleItem("사이다", Currency.USD, 2),
-                                new VendingMachineConsoleItem("물", Currency.USD, 1),
-                                new VendingMachineConsoleItem("커피", Currency.USD, 1)
-                        ),
-                        List.of(
-                                new VendingMachineConsoleItem("껌", Currency.USD, 1),
-                                new VendingMachineConsoleItem("과자", Currency.USD, 2),
-                                new VendingMachineConsoleItem("아이스아메리카노", Currency.USD, 1),
-                                new VendingMachineConsoleItem("탄산음료", Currency.USD, 2)
-                        )
-                )
+    private NormalPeople generateNormalPeople1() {
+        ArrayList<Paper> normalPeoplePaper = new ArrayList<>();
+        normalPeoplePaper.add(new Paper("아무것도 아님", "일반종이", 0, "", false));
+        normalPeoplePaper.add(new Paper(WonCash.WON_CASH_1000.getCharacterDesign(), WonCash.WON_CASH_1000.getPaperKind(), WonCash.WON_CASH_1000.getDisplayValue(), WonCash.WON_CASH_1000.getHolographic(), false));
+        normalPeoplePaper.add(new Paper(WonCash.WON_CASH_1000.getCharacterDesign(), WonCash.WON_CASH_1000.getPaperKind(), WonCash.WON_CASH_1000.getDisplayValue(), WonCash.WON_CASH_1000.getHolographic(), false));
+        normalPeoplePaper.add(new Paper(WonCash.WON_CASH_1000.getCharacterDesign(), WonCash.WON_CASH_1000.getPaperKind(), WonCash.WON_CASH_1000.getDisplayValue(), WonCash.WON_CASH_1000.getHolographic(), false));
+        normalPeoplePaper.add(new Paper(WonCash.WON_CASH_5000.getCharacterDesign(), WonCash.WON_CASH_5000.getPaperKind(), WonCash.WON_CASH_5000.getDisplayValue(), WonCash.WON_CASH_5000.getHolographic(), false));
+        normalPeoplePaper.add(new Paper(WonCash.WON_CASH_5000.getCharacterDesign(), WonCash.WON_CASH_5000.getPaperKind(), WonCash.WON_CASH_5000.getDisplayValue(), WonCash.WON_CASH_5000.getHolographic(), true));
+        normalPeoplePaper.add(new Paper(WonCash.WON_CASH_10000.getCharacterDesign(), WonCash.WON_CASH_10000.getPaperKind(), WonCash.WON_CASH_10000.getDisplayValue(), "위조지폐", false));
+        normalPeoplePaper.add(new Paper("신샤임당", WonCash.WON_CASH_50000.getPaperKind(), WonCash.WON_CASH_50000.getDisplayValue(), WonCash.WON_CASH_5000.getHolographic(), false));
+        ArrayList<Metal> normalPeopleMetal = new ArrayList<>();
+        normalPeopleMetal.add(new Metal("별", 0, 0, "별", "철"));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_10.getShape(), WonCoin.WON_COIN_10.getTeethCount(), WonCoin.WON_COIN_10.getDisplayValue(), WonCoin.WON_COIN_10.getDesign(), WonCoin.WON_COIN_10.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_10.getShape(), WonCoin.WON_COIN_10.getTeethCount(), WonCoin.WON_COIN_10.getDisplayValue(), WonCoin.WON_COIN_10.getDesign(), WonCoin.WON_COIN_10.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_10.getShape(), WonCoin.WON_COIN_10.getTeethCount(), WonCoin.WON_COIN_10.getDisplayValue(), WonCoin.WON_COIN_10.getDesign(), WonCoin.WON_COIN_10.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_50.getShape(), WonCoin.WON_COIN_50.getTeethCount(), WonCoin.WON_COIN_50.getDisplayValue(), WonCoin.WON_COIN_50.getDesign(), WonCoin.WON_COIN_50.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_50.getShape(), WonCoin.WON_COIN_50.getTeethCount(), WonCoin.WON_COIN_50.getDisplayValue(), WonCoin.WON_COIN_50.getDesign(), WonCoin.WON_COIN_50.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_50.getShape(), WonCoin.WON_COIN_50.getTeethCount(), WonCoin.WON_COIN_50.getDisplayValue(), WonCoin.WON_COIN_50.getDesign(), WonCoin.WON_COIN_50.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_50.getShape(), WonCoin.WON_COIN_50.getTeethCount(), WonCoin.WON_COIN_50.getDisplayValue(), WonCoin.WON_COIN_50.getDesign(), WonCoin.WON_COIN_50.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_100.getShape(), WonCoin.WON_COIN_100.getTeethCount(), WonCoin.WON_COIN_100.getDisplayValue(), WonCoin.WON_COIN_100.getDesign(), WonCoin.WON_COIN_100.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_100.getShape(), WonCoin.WON_COIN_100.getTeethCount(), WonCoin.WON_COIN_100.getDisplayValue(), WonCoin.WON_COIN_100.getDesign(), WonCoin.WON_COIN_100.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_100.getShape(), 100, WonCoin.WON_COIN_100.getDisplayValue(), WonCoin.WON_COIN_100.getDesign(), WonCoin.WON_COIN_100.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), WonCoin.WON_COIN_500.getDesign(), WonCoin.WON_COIN_500.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), WonCoin.WON_COIN_500.getDesign(), WonCoin.WON_COIN_500.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), WonCoin.WON_COIN_500.getDesign(), WonCoin.WON_COIN_500.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), WonCoin.WON_COIN_500.getDesign(), WonCoin.WON_COIN_500.getMetalKind()));
+        normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), "햑", WonCoin.WON_COIN_500.getMetalKind()));
+        return new NormalPeople(
+                normalPeoplePaper,
+                normalPeopleMetal
         );
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new WonCash(1000));
-        vendingMachine.pushCash(new BadWonCash(1000));
-        vendingMachine.pushCash(new DollarCash(1));
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(0, 1);
-        vendingMachine.selectItem(0, 2);
-        vendingMachine.printOutletItems();
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new DollarCash(2));
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new DollarCash(2));
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new BadDollarCash(2));
-        vendingMachine.selectItem(0, 0);
-        vendingMachine.printOutletItems();
-        vendingMachine.selectItem(1, 1);
-        vendingMachine.printOutletItems();
-        vendingMachine.selectItem(0,0);
-        vendingMachine.pushCard(new CheckCard(Currency.USD, 3));
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(0,0);
-        vendingMachine.printOutletItems();
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(0,0);
-        vendingMachine.selectItem(0,2);
-        vendingMachine.pushCard(new CreditCard(Currency.USD, 0,-5));
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(1,0);
-        vendingMachine.selectItem(1,1);
-        vendingMachine.printOutletItems();
-        vendingMachine.selectItem(0,1);
-        vendingMachine.selectItem(0,1);
-        vendingMachine.pushCard(new CreditCard(Currency.KRW, 0,-5000));
-        vendingMachine.printDisplayItems();
-        vendingMachine.pushCash(new DollarCash(3));
-        vendingMachine.selectItem(0,0);
-        vendingMachine.printOutletItems();
-        vendingMachine.change();
-        vendingMachine.printDisplayItems();
-        vendingMachine.selectItem(0,1);
+    }
+
+    private CashPaymentMachine generateCashPaymentMachine(int won10Count, int won50Count, int won100Count, int won500Count, int won1000Count, int won5000Count, int won10000Count, int won50000Count) {
+        ArrayList<Metal> metals = new ArrayList<>();
+        for (int i = 0; i < won10Count; i++) {
+            metals.add(new Metal(WonCoin.WON_COIN_10.getShape(), WonCoin.WON_COIN_10.getTeethCount(), WonCoin.WON_COIN_10.getDisplayValue(), WonCoin.WON_COIN_10.getDesign(), WonCoin.WON_COIN_10.getMetalKind()));
+        }
+        for (int i = 0; i < won50Count; i++) {
+            metals.add(new Metal(WonCoin.WON_COIN_50.getShape(), WonCoin.WON_COIN_50.getTeethCount(), WonCoin.WON_COIN_50.getDisplayValue(), WonCoin.WON_COIN_50.getDesign(), WonCoin.WON_COIN_50.getMetalKind()));
+        }
+        for (int i = 0; i < won100Count; i++) {
+            metals.add(new Metal(WonCoin.WON_COIN_100.getShape(), WonCoin.WON_COIN_100.getTeethCount(), WonCoin.WON_COIN_100.getDisplayValue(), WonCoin.WON_COIN_100.getDesign(), WonCoin.WON_COIN_100.getMetalKind()));
+        }
+        for (int i = 0; i < won500Count; i++) {
+            metals.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), WonCoin.WON_COIN_500.getDesign(), WonCoin.WON_COIN_500.getMetalKind()));
+        }
+        ArrayList<Paper> papers = new ArrayList<>();
+        for (int i = 0; i < won1000Count; i++) {
+            papers.add(new Paper(WonCash.WON_CASH_1000.getCharacterDesign(), WonCash.WON_CASH_1000.getPaperKind(), WonCash.WON_CASH_1000.getDisplayValue(), WonCash.WON_CASH_1000.getHolographic(), false));
+        }
+        for (int i = 0; i < won5000Count; i++) {
+            papers.add(new Paper(WonCash.WON_CASH_5000.getCharacterDesign(), WonCash.WON_CASH_5000.getPaperKind(), WonCash.WON_CASH_5000.getDisplayValue(), WonCash.WON_CASH_5000.getHolographic(), false));
+        }
+        for (int i = 0; i < won10000Count; i++) {
+            papers.add(new Paper(WonCash.WON_CASH_10000.getCharacterDesign(), WonCash.WON_CASH_10000.getPaperKind(), WonCash.WON_CASH_10000.getDisplayValue(), WonCash.WON_CASH_10000.getHolographic(), false));
+        }
+        for (int i = 0; i < won50000Count; i++) {
+            papers.add(new Paper(WonCash.WON_CASH_50000.getCharacterDesign(), WonCash.WON_CASH_50000.getPaperKind(), WonCash.WON_CASH_50000.getDisplayValue(), WonCash.WON_CASH_50000.getHolographic(), false));
+        }
+        return new CashPaymentMachine(
+                papers,
+                metals
+        );
     }
 }
