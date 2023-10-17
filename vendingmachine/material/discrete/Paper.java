@@ -1,5 +1,6 @@
-package vendingmachine.material;
+package vendingmachine.material.discrete;
 
+import vendingmachine.material.RealObject;
 import vendingmachine.won.WonCash;
 
 /**
@@ -8,7 +9,7 @@ import vendingmachine.won.WonCash;
  * 따라서 Cash 즉 현금으로 추상화 하는 것은 다소 부적절하다 생각하였고
  * 이러한 것들을 나타내는 것을 Paper 라고 하였습니다.
  */
-public class Paper extends RealObject {
+public class Paper extends DiscreteRealObject {
     private String characterDesign;
     private String paperKind;
     private int displayValue;

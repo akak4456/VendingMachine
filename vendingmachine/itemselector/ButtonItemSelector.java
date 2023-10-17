@@ -3,51 +3,50 @@ package vendingmachine.itemselector;
 import vendingmachine.VendingMachine;
 import vendingmachine.VendingMachineVO;
 import vendingmachine.material.RealObject;
-import vendingmachine.material.finished.*;
+import vendingmachine.material.discrete.*;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
-public class ButtonItemSelector implements ItemSelector<ButtonSelectorDTO> {
-    List<List<Item>> itemDeploy;
-    ArrayList<ArrayList<Queue<Item>>> items;
+public class ButtonItemSelector extends ItemSelector<ButtonSelectorDTO> {
 
     public ButtonItemSelector() {
-        itemDeploy = List.of(
+        displayItem = List.of(
                 List.of(
-                        new Item(new Cider(), new VendingMachineVO(2000)),
-                        new Item(new Coke(), new VendingMachineVO(2000)),
-                        new Item(new Fruit(), new VendingMachineVO(3000)),
-                        new Item(new Gold(), new VendingMachineVO(10000))
+                        new Item("사이다", List.of(new Cider()), new Cider(), new VendingMachineVO(2000)),
+                        new Item("콜라", List.of(new Coke()), new Coke(), new VendingMachineVO(2000)),
+                        new Item("과일", List.of(new Fruit()), new Fruit(), new VendingMachineVO(3000)),
+                        new Item("금", List.of(new Gold()), new Gold(), new VendingMachineVO(10000))
                 ),
                 List.of(
-                        new Item(new Gum(), new VendingMachineVO(500)),
-                        new Item(new IceCream(), new VendingMachineVO(4000)),
-                        new Item(new Snack(), new VendingMachineVO(4000)),
-                        new Item(new Water(), new VendingMachineVO(1000))
+                        new Item("껌", List.of(new Gum()), new Gum(), new VendingMachineVO(500)),
+                        new Item("아이스크림", List.of(new IceCream()), new IceCream(), new VendingMachineVO(4000)),
+                        new Item("과자", List.of(new Snack()), new Snack(), new VendingMachineVO(4000)),
+                        new Item("물병", List.of(new WaterBottle()), new WaterBottle(), new VendingMachineVO(1000))
                 )
         );
+        itemsInMachine = new ArrayList<>();
     }
 
     @Override
-    public void showSelector(VendingMachine vendingMachine) {
+    public void showSelector(VendingMachine<ButtonSelectorDTO> vendingMachine) {
         System.out.println("----------------------------------------------------------");
-        for (int i = 0; i < itemDeploy.size(); i++) {
-            for (int j = 0; j < itemDeploy.get(i).size(); j++) {
-                Item item = itemDeploy.get(i).get(j);
-                item.setButtonOn(false);
-                if (false) {
-                    // TODO 카드결제가 이루어지고 있다면
-                    item.setButtonOn(true);
-                } else if (vendingMachine.isCashPaymentMachineVOGreaterThanOrEqualsTo(item.getVo())) {
-                    if (items.get(i).get(j).size() > 0) {
-                        item.setButtonOn(true);
-                    }
-                }
+        for (int i = 0; i < displayItem.size(); i++) {
+            for (int j = 0; j < displayItem.get(i).size(); j++) {
+                Item item = displayItem.get(i).get(j);
+                item.setButtonStatus(Item.BUTTON_STATUS_OFF);
 
-                System.out.print(item.realObject + "(" + item.isButtonOn + " 재고:" + items.get(i).get(j).size() + ")");
+                if (hasRecipeItemInMachine(item.getRequiredRealObjects())) {
+                    if (false) {
+                        // TODO 카드결제가 이루어지고 있다면
+                        item.setButtonStatus(Item.BUTTON_STATUS_ON);
+                    } else if (vendingMachine.isCashPaymentMachineVOGreaterThanOrEqualsTo(item.getVo())) {
+                        item.setButtonStatus(Item.BUTTON_STATUS_ON);
+                    }
+                } else {
+                    item.setButtonStatus(Item.BUTTON_STATUS_NO_ITEM);
+                }
+                System.out.println(item.getItemDesc() + "(" + item.getButtonStatus() + ")");
             }
             System.out.println();
         }
@@ -56,67 +55,36 @@ public class ButtonItemSelector implements ItemSelector<ButtonSelectorDTO> {
 
     @Override
     public void pushRealObjects(List<RealObject> realObjects) {
-        for (int i = 0; i < itemDeploy.size(); i++) {
-            items.add(new ArrayList<>());
-            for (int j = 0; j < itemDeploy.get(i).size(); j++) {
-                items.get(i).add(new LinkedList<>());
-            }
-        }
+
         for (RealObject realObject : realObjects) {
-            for (int i = 0; i < itemDeploy.size(); i++) {
-                boolean isFound = false;
-                for (int j = 0; j < itemDeploy.get(i).size(); j++) {
-                    if (realObject.getClass() == itemDeploy.get(i).get(j).getRealObject().getClass()) {
-                        items.get(i).get(j).add(itemDeploy.get(i).get(j));
-                        isFound = true;
-                        break;
-                    }
-                }
-                if (isFound) {
+            boolean isFound = false;
+            for (ArrayList<RealObject> tmp : itemsInMachine) {
+                if (!tmp.isEmpty() && tmp.get(0).getClass() == realObject.getClass()) {
+                    isFound = true;
+                    tmp.add(realObject);
                     break;
                 }
+            }
+            if (!isFound) {
+                ArrayList<RealObject> tmp = new ArrayList<>();
+                tmp.add(realObject);
+                itemsInMachine.add(tmp);
             }
         }
     }
 
     @Override
-    public RealObject selectItem(ButtonSelectorDTO selectorDTO) {
-        if (0 <= selectorDTO.getRow() && selectorDTO.getRow() < itemDeploy.size()) {
-            if (0 <= selectorDTO.getCol() && selectorDTO.getCol() < itemDeploy.get(selectorDTO.getRow()).size()) {
-                if (items.get(selectorDTO.getRow()).get(selectorDTO.getCol()).size() > 0) {
-                    return items.get(selectorDTO.getRow()).get(selectorDTO.getCol()).remove().realObject;
+    public RealObject selectItem(ButtonSelectorDTO selectorDTO, VendingMachineVO paidVO) {
+        if (0 <= selectorDTO.getRow() && selectorDTO.getRow() < displayItem.size()) {
+            if (0 <= selectorDTO.getCol() && selectorDTO.getCol() < displayItem.get(selectorDTO.getRow()).size()) {
+                Item item = displayItem.get(selectorDTO.getRow()).get(selectorDTO.getCol());
+                if (hasRecipeItemInMachine(item.getRequiredRealObjects())) {
+                    if (paidVO.isGreaterThanOrEqualsTo(item.getVo())) {
+                        return subtractRealObjectAndMixIfNeeded(item);
+                    }
                 }
             }
         }
         return null;
-    }
-
-    class Item {
-        private RealObject realObject;
-        private VendingMachineVO vo;
-
-        private boolean isButtonOn;
-
-        public Item(RealObject realObject, VendingMachineVO vo) {
-            this.realObject = realObject;
-            this.vo = vo;
-            this.isButtonOn = false;
-        }
-
-        public RealObject getRealObject() {
-            return realObject;
-        }
-
-        public VendingMachineVO getVo() {
-            return vo;
-        }
-
-        public boolean isButtonOn() {
-            return isButtonOn;
-        }
-
-        public void setButtonOn(boolean buttonOn) {
-            isButtonOn = buttonOn;
-        }
     }
 }

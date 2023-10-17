@@ -1,7 +1,7 @@
 package vendingmachine.people;
 
-import vendingmachine.material.Metal;
-import vendingmachine.material.Paper;
+import vendingmachine.material.discrete.Metal;
+import vendingmachine.material.discrete.Paper;
 
 import java.util.ArrayList;
 import java.util.List;

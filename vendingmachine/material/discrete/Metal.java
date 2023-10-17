@@ -1,5 +1,6 @@
-package vendingmachine.material;
+package vendingmachine.material.discrete;
 
+import vendingmachine.material.RealObject;
 import vendingmachine.won.WonCoin;
 
 /**
@@ -7,7 +8,7 @@ import vendingmachine.won.WonCoin;
  * 따라서 Coin 즉 동전으로 추상화 하는 것은 다소 부적절하다 생각하였고
  * 이러한 것들을 나타내는 것을 Metal 이라고 하였습니다.
  */
-public class Metal extends RealObject {
+public class Metal extends DiscreteRealObject {
     private String shape;
     private int teethCount;
     private int displayValue;

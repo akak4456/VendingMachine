@@ -2,8 +2,8 @@ package vendingmachine;
 
 import vendingmachine.itemselector.ItemSelector;
 import vendingmachine.itemselector.SelectorDTO;
-import vendingmachine.material.Metal;
-import vendingmachine.material.Paper;
+import vendingmachine.material.discrete.Metal;
+import vendingmachine.material.discrete.Paper;
 import vendingmachine.paymentmachine.CashPaymentMachine;
 import vendingmachine.people.NormalPeople;
 
