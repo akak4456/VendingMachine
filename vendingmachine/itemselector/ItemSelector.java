@@ -1,24 +1,54 @@
 package vendingmachine.itemselector;
 
+import vendingmachine.Pair;
 import vendingmachine.VendingMachine;
 import vendingmachine.VendingMachineVO;
 import vendingmachine.material.RealObject;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
-public abstract class ItemSelector<S extends SelectorDTO> {
+public abstract class ItemSelector<S extends SelectorDTO, I extends Item> {
 
-    protected ArrayList<ArrayList<RealObject>> itemsInMachine;
+    protected ArrayList<ArrayList<RealObject>> itemsInMachine = new ArrayList<>();
 
-    protected List<List<Item>> displayItem;
+    protected List<List<I>> displayItem;
 
-    abstract public void showSelector(VendingMachine<S> vendingMachine);
+    abstract public void showSelector(VendingMachine<S, I> vendingMachine);
 
-    abstract public void pushRealObjects(List<RealObject> realObjects);
+    public final void pushRealObjects(List<RealObject> realObjects) {
+        for (RealObject realObject : realObjects) {
+            boolean isFound = false;
+            for (ArrayList<RealObject> tmp : itemsInMachine) {
+                if (!tmp.isEmpty() && tmp.get(0).getClass() == realObject.getClass()) {
+                    isFound = true;
+                    tmp.add(realObject);
+                    break;
+                }
+            }
+            if (!isFound) {
+                ArrayList<RealObject> tmp = new ArrayList<>();
+                tmp.add(realObject);
+                itemsInMachine.add(tmp);
+            }
+        }
+    }
 
-    abstract public RealObject selectItem(S selectorDTO, VendingMachineVO paidVO);
+    public final Pair<RealObject, VendingMachineVO> selectItem(S selectDTO, VendingMachineVO paidVO) {
+        Item item = selectItemLogic(selectDTO);
+        if (item == null) {
+            return null;
+        }
+        if (hasRecipeItemInMachine(item.getRequiredRealObjects())) {
+            if (paidVO.isGreaterThanOrEqualsTo(item.getVo())) {
+                return new Pair<>(subtractRealObjectAndMixIfNeeded(item), item.getVo());
+            }
+        }
+        return null;
+    }
+
+    protected abstract Item selectItemLogic(S selectDTO);
 
     protected boolean hasRecipeItemInMachine(List<RealObject> recipes) {
         for (RealObject recipe : recipes) {
@@ -62,49 +92,7 @@ public abstract class ItemSelector<S extends SelectorDTO> {
                 }
             }
         }
-        return targetItem.resultRealObject;
+        return targetItem.getResultRealObject();
     }
 
-    class Item {
-        public static final String BUTTON_STATUS_OFF = "off";
-        public static final String BUTTON_STATUS_ON = "on";
-        public static final String BUTTON_STATUS_NO_ITEM = "재고없음";
-        private final String itemDesc;
-        private final List<RealObject> requiredRealObjects;
-        private final RealObject resultRealObject;
-        private final VendingMachineVO vo;
-        private String buttonStatus;
-
-        public Item(String itemDesc, List<RealObject> requiredObject, RealObject resultRealObject, VendingMachineVO vo) {
-            this.itemDesc = itemDesc;
-            this.requiredRealObjects = requiredObject;
-            this.resultRealObject = resultRealObject;
-            this.vo = vo;
-            this.buttonStatus = BUTTON_STATUS_OFF;
-        }
-
-        public String getItemDesc() {
-            return itemDesc;
-        }
-
-        public VendingMachineVO getVo() {
-            return vo;
-        }
-
-        public List<RealObject> getRequiredRealObjects() {
-            return requiredRealObjects;
-        }
-
-        public RealObject getResultRealObject() {
-            return resultRealObject;
-        }
-
-        public String getButtonStatus() {
-            return buttonStatus;
-        }
-
-        public void setButtonStatus(String buttonStatus) {
-            this.buttonStatus = buttonStatus;
-        }
-    }
 }

@@ -1,15 +1,19 @@
 import vendingmachine.VendingMachine;
-import vendingmachine.VendingMachineConsole;
 import vendingmachine.itemselector.ButtonItemSelector;
 import vendingmachine.itemselector.ButtonSelectorDTO;
-import vendingmachine.material.discrete.Metal;
-import vendingmachine.material.discrete.Paper;
+import vendingmachine.itemselector.ButtonSelectorItem;
+import vendingmachine.itemselector.Item;
+import vendingmachine.material.discrete.*;
 import vendingmachine.paymentmachine.CashPaymentMachine;
+import vendingmachine.people.Manager;
 import vendingmachine.people.NormalPeople;
 import vendingmachine.won.WonCash;
 import vendingmachine.won.WonCoin;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 public class VendingMachineClient {
     public static void main(String[] args) {
@@ -19,10 +23,30 @@ public class VendingMachineClient {
 
     public void story1() {
         NormalPeople normalPeople = generateNormalPeople1();
-        VendingMachine<ButtonSelectorDTO> vendingMachine = new VendingMachineConsole<>(
+        Manager manager = new Manager(new ArrayList<>(), new ArrayList<>());
+        VendingMachine<ButtonSelectorDTO, ButtonSelectorItem> vendingMachine = new VendingMachine<>(
                 generateCashPaymentMachine(10, 10, 10, 10, 10, 10, 10, 10),
                 new ButtonItemSelector()
         );
+        vendingMachine.pushRealObject(
+                manager,
+                Map.of(
+                        Coke.class, 10,
+                        Cider.class, 10,
+                        Fruit.class, 10,
+                        Gold.class, 10,
+                        Gum.class, 10,
+                        IceCream.class, 10,
+                        Snack.class, 10,
+                        WaterBottle.class, 10
+                )
+        );
+        vendingMachine.showSelector();
+        vendingMachine.pushPaper(normalPeople, normalPeople.getPaperAt(0));
+        vendingMachine.pushPaper(normalPeople, normalPeople.getPaperAt(1));
+        vendingMachine.selectItem(new ButtonSelectorDTO(1, 0));
+        vendingMachine.showOutlet();
+        vendingMachine.showSelector();
     }
 
     private NormalPeople generateNormalPeople1() {

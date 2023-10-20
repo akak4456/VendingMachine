@@ -129,4 +129,8 @@ public class CashPaymentMachine {
     public boolean isUserVOGreaterThanOrEqualsTo(VendingMachineVO vo) {
         return userInputVO.isGreaterThanOrEqualsTo(vo);
     }
+
+    public VendingMachineVO getUserInputVO() {
+        return userInputVO;
+    }
 }

@@ -1,8 +1,8 @@
 package vendingmachine.itemselector;
 
 public class ButtonSelectorDTO extends SelectorDTO{
-    private int row;
-    private int col;
+    private final int row;
+    private final int col;
 
     public ButtonSelectorDTO(int row, int col) {
         this.row = row;
