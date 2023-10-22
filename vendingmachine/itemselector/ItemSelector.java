@@ -42,7 +42,12 @@ public abstract class ItemSelector<S extends SelectorDTO, I extends Item> {
         }
         if (hasRecipeItemInMachine(item.getRequiredRealObjects())) {
             if (paidVO.isGreaterThanOrEqualsTo(item.getVo())) {
-                return new Pair<>(subtractRealObjectAndMixIfNeeded(item), item.getVo());
+                RealObject target = subtractRealObjectAndMixIfNeeded(item);
+                if(target != null) {
+                    return new Pair<>(target, item.getVo());
+                } else {
+                    return null;
+                }
             }
         }
         return null;
@@ -90,6 +95,9 @@ public abstract class ItemSelector<S extends SelectorDTO, I extends Item> {
                 if (isDone) {
                     break;
                 }
+            }
+            if(!isDone) {
+                return null;
             }
         }
         return targetItem.getResultRealObject();

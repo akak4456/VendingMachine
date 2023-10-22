@@ -85,7 +85,7 @@ public class VendingMachine<S extends SelectorDTO, I extends Item> {
         for (Map.Entry<Class<? extends RealObject>, Integer> entry : objectMap.entrySet()) {
             Class<? extends RealObject> clazz = entry.getKey();
             try {
-                if (clazz.isAssignableFrom(DiscreteRealObject.class)) {
+                if (DiscreteRealObject.class.isAssignableFrom(clazz)) {
                     for (int i = 0; i < entry.getValue(); i++) {
                         DiscreteRealObject object = (DiscreteRealObject) clazz.getConstructor().newInstance();
                         objects.add(object);
@@ -95,7 +95,7 @@ public class VendingMachine<S extends SelectorDTO, I extends Item> {
                     objects.add(object);
                 }
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
 
         }
@@ -142,6 +142,8 @@ public class VendingMachine<S extends SelectorDTO, I extends Item> {
             } else {
                 System.out.println("결제에 문제가 생겼습니다.");
             }
+            return;
         }
+        System.out.println("아이템을 선택하는 과정 중에 문제가 발생했습니다. 관리자에게 문의해주세요.");
     }
 }

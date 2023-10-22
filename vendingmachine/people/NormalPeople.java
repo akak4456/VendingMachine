@@ -46,6 +46,10 @@ public class NormalPeople {
         this.metals.addAll(metals);
     }
 
+    public Metal getMetalAt(int idx) {
+        return metals.get(idx);
+    }
+
     public Paper getPaperAt(int idx) {
         return papers.get(idx);
     }

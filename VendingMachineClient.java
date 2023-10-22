@@ -5,6 +5,7 @@ import vendingmachine.itemselector.ButtonSelectorDTO;
 import vendingmachine.itemselector.ButtonSelectorItem;
 import vendingmachine.itemselector.Item;
 import vendingmachine.material.discrete.*;
+import vendingmachine.paymentmachine.CardPaymentMachine;
 import vendingmachine.paymentmachine.CashPaymentMachine;
 import vendingmachine.people.Manager;
 import vendingmachine.people.NormalPeople;
@@ -19,14 +20,18 @@ import java.util.function.Function;
 public class VendingMachineClient {
     public static void main(String[] args) {
         VendingMachineClient client = new VendingMachineClient();
-        client.story1();
+        client.story2();
     }
 
+    /**
+     * 현금 결제 일반적인 경우
+     */
     public void story1() {
         NormalPeople normalPeople = generateNormalPeople1();
         Manager manager = new Manager(new ArrayList<>(), new ArrayList<>());
         VendingMachine<ButtonSelectorDTO, ButtonSelectorItem> vendingMachine = new VendingMachine<>(
                 generateCashPaymentMachine(10, 10, 10, 10, 10, 10, 10, 10),
+                new CardPaymentMachine(),
                 new ButtonItemSelector()
         );
         vendingMachine.pushRealObject(
@@ -48,6 +53,41 @@ public class VendingMachineClient {
         vendingMachine.selectItem(new ButtonSelectorDTO(1, 0));
         vendingMachine.showOutlet();
         vendingMachine.showSelector();
+    }
+
+    /**
+     * 현금 결제 재고 부족 테스트
+     */
+    public void story2() {
+        NormalPeople normalPeople = generateNormalPeople1();
+        Manager manager = new Manager(new ArrayList<>(), new ArrayList<>());
+        VendingMachine<ButtonSelectorDTO, ButtonSelectorItem> vendingMachine = new VendingMachine<>(
+                generateCashPaymentMachine(10, 10, 10, 10, 10, 10, 10, 10),
+                new CardPaymentMachine(),
+                new ButtonItemSelector()
+        );
+        vendingMachine.pushRealObject(
+                manager,
+                Map.of(
+                        Coke.class, 1,
+                        Cider.class, 1,
+                        Fruit.class, 1,
+                        Gold.class, 1,
+                        Gum.class, 1,
+                        IceCream.class, 1,
+                        Snack.class, 1,
+                        WaterBottle.class, 1
+                )
+        );
+        vendingMachine.showSelector();
+        vendingMachine.pushMetal(normalPeople, normalPeople.getMetalAt(9));
+        vendingMachine.pushMetal(normalPeople, normalPeople.getMetalAt(10));
+        vendingMachine.showSelector();
+        vendingMachine.selectItem(new ButtonSelectorDTO(1,0));
+        vendingMachine.showOutlet();
+        vendingMachine.pushPaper(normalPeople, normalPeople.getPaperAt(1));
+        vendingMachine.selectItem(new ButtonSelectorDTO(1,0));
+        vendingMachine.showOutlet();
     }
 
     private NormalPeople generateNormalPeople1() {
