@@ -1,3 +1,4 @@
+import vendingmachine.UserAccount;
 import vendingmachine.VendingMachine;
 import vendingmachine.itemselector.ButtonItemSelector;
 import vendingmachine.itemselector.ButtonSelectorDTO;
@@ -76,9 +77,14 @@ public class VendingMachineClient {
         normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), WonCoin.WON_COIN_500.getDesign(), WonCoin.WON_COIN_500.getMetalKind()));
         normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), WonCoin.WON_COIN_500.getDesign(), WonCoin.WON_COIN_500.getMetalKind()));
         normalPeopleMetal.add(new Metal(WonCoin.WON_COIN_500.getShape(), WonCoin.WON_COIN_500.getTeethCount(), WonCoin.WON_COIN_500.getDisplayValue(), "햑", WonCoin.WON_COIN_500.getMetalKind()));
+        ArrayList<Plastic> plastics = new ArrayList<>();
+        plastics.add(new Plastic("일반", null, null));
+        plastics.add(new Plastic("IC", new IC(new UserAccount(10000, 0)), null));
+        plastics.add(new Plastic("Magnetic", null, new Magnetic(new UserAccount(10000, -10000))));
         return new NormalPeople(
                 normalPeoplePaper,
-                normalPeopleMetal
+                normalPeopleMetal,
+                plastics
         );
     }
 

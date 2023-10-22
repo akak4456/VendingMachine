@@ -36,8 +36,7 @@ public class ButtonItemSelector extends ItemSelector<ButtonSelectorDTO, ButtonSe
                 item.setButtonStatus(ButtonSelectorItem.BUTTON_STATUS_OFF);
 
                 if (hasRecipeItemInMachine(item.getRequiredRealObjects())) {
-                    if (false) {
-                        // TODO 카드결제가 이루어지고 있다면
+                    if (vendingMachine.isCardPaymentAvailable()) {
                         item.setButtonStatus(ButtonSelectorItem.BUTTON_STATUS_ON);
                     } else if (vendingMachine.isCashPaymentMachineVOGreaterThanOrEqualsTo(item.getVo())) {
                         item.setButtonStatus(ButtonSelectorItem.BUTTON_STATUS_ON);
@@ -54,8 +53,8 @@ public class ButtonItemSelector extends ItemSelector<ButtonSelectorDTO, ButtonSe
 
     @Override
     protected Item selectItemLogic(ButtonSelectorDTO selectDTO) {
-        if(0 <= selectDTO.getRow() && selectDTO.getRow() < displayItem.size()) {
-            if(0 <= selectDTO.getCol() && selectDTO.getCol() < displayItem.get(selectDTO.getRow()).size()) {
+        if (0 <= selectDTO.getRow() && selectDTO.getRow() < displayItem.size()) {
+            if (0 <= selectDTO.getCol() && selectDTO.getCol() < displayItem.get(selectDTO.getRow()).size()) {
                 return displayItem.get(selectDTO.getRow()).get(selectDTO.getCol());
             }
         }

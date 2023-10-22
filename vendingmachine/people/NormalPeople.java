@@ -2,6 +2,7 @@ package vendingmachine.people;
 
 import vendingmachine.material.discrete.Metal;
 import vendingmachine.material.discrete.Paper;
+import vendingmachine.material.discrete.Plastic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +14,12 @@ public class NormalPeople {
     private ArrayList<Paper> papers;
     private ArrayList<Metal> metals;
 
-    public NormalPeople(ArrayList<Paper> papers, ArrayList<Metal> metals) {
+    private ArrayList<Plastic> plastics;
+
+    public NormalPeople(ArrayList<Paper> papers, ArrayList<Metal> metals, ArrayList<Plastic> plastics) {
         this.papers = papers;
         this.metals = metals;
+        this.plastics = plastics;
     }
 
     public boolean containsPaper(Paper paper) {
@@ -44,5 +48,13 @@ public class NormalPeople {
 
     public Paper getPaperAt(int idx) {
         return papers.get(idx);
+    }
+
+    public boolean containsPlastic(Plastic plastic) {
+        return plastics.contains(plastic);
+    }
+
+    public Plastic getPlasticAt(int idx) {
+        return plastics.get(idx);
     }
 }

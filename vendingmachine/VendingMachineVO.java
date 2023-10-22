@@ -5,6 +5,7 @@ package vendingmachine;
  * 원화를 기준으로 한다. 다시말해 value 가 1000 이면 1000원 임을 의미한다.
  */
 public class VendingMachineVO {
+    public static final VendingMachineVO MAX_VO = new VendingMachineVO(Integer.MAX_VALUE);
     private int value;
 
     public VendingMachineVO() {
@@ -37,6 +38,6 @@ public class VendingMachineVO {
 
     @Override
     public String toString() {
-        return this.value +"원";
+        return this.value + "원";
     }
 }
